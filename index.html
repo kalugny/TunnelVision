@@ -1,0 +1,86 @@
+<html>
+<head>
+    <title>Tunnel Vision</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+
+    <link rel="stylesheet" href="css/style.css" />
+
+</head>
+<body>
+<svg>
+    <defs>
+        <linearGradient id="gradient" x1="0" y1="00%" x2 ="0" y2="100%">
+            <stop stop-color="black" offset="0"/>
+            <stop stop-color="white" offset="1"/>
+        </linearGradient>
+
+        <mask id="mask" maskUnits="userSpaceOnUse " maskContentUnits="userSpaceOnUse ">
+
+            <circle id="circle" cx="100" cy="100" r="10000" fill="white" />
+        </mask>
+    </defs>
+
+
+    <foreignObject width="100%" height="100%" style="mask: url(#mask);">
+        <div class="container">
+        <h1>Tunnel Vision</h1>
+
+        <div class="form-group">
+            <label for="videoIdInput">Enter YouTube video id:</label>
+            <input id="videoIdInput" class="form-control" type="text" value="I76v3vlACvw"/>
+        </div>
+
+        <div id="ytapiplayer">
+        You need Flash player 8+ and JavaScript enabled to view this video.
+        </div>
+        </div>
+    </foreinObject>
+</svg>
+
+
+
+<script type="application/javascript" src="js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
+<script>
+
+
+var width  = $(".container").innerWidth();
+var height = width * 0.609375;
+
+var params = { allowScriptAccess: "always" };
+var atts = { id: "myytplayer" };
+swfobject.embedSWF("http://www.youtube.com/v/I76v3vlACvw?enablejsapi=1&playerapiid=ytplayer&version=3",
+                       "ytapiplayer", "425", "356", "8", null, null, params, atts);
+var player;
+function onYouTubePlayerReady(playerId) {
+    player = document.getElementById("myytplayer");
+    $("#myytplayer").hide();
+};
+
+function mouseOver(e){
+    var c = $('svg')[0].getElementById('circle');
+    c.setAttribute('cy', e.pageY);
+    c.setAttribute('cx', e.pageX);
+}
+
+$(document).ready(function(){
+    $("#videoIdInput").keypress(function(e){
+        console.log(e.keyCode);
+        if (e.keyCode == 13 && player){
+            $("#myytplayer").show();
+            player.loadVideoById($("#videoIdInput").val());
+            var c = $('svg')[0].getElementById('circle');
+            c.setAttribute('r', 100)
+        }
+    });
+    $(window).mousemove(mouseOver);
+});
+
+
+</script>
+</body>
+</html>
