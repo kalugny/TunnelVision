@@ -34,9 +34,8 @@
             <input id="videoIdInput" class="form-control" type="text" value="I76v3vlACvw"/>
         </div>
 
-        <div id="ytapiplayer">
-        You need Flash player 8+ and JavaScript enabled to view this video.
-        </div>
+        <div id="player"></div>
+
         </div>
     </foreinObject>
 </svg>
@@ -44,22 +43,28 @@
 
 
 <script type="application/javascript" src="js/jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="js/swfobject.js"></script>
 <script>
 
 
 var width  = $(".container").innerWidth();
 var height = width * 0.609375;
+var tag = document.createElement('script');
 
-var params = { allowScriptAccess: "always" };
-var atts = { id: "myytplayer" };
-swfobject.embedSWF("http://www.youtube.com/v/I76v3vlACvw?enablejsapi=1&playerapiid=ytplayer&version=3",
-                       "ytapiplayer", "425", "356", "8", null, null, params, atts);
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+// 3. This function creates an <iframe> (and YouTube player)
+//    after the API code downloads.
 var player;
-function onYouTubePlayerReady(playerId) {
-    player = document.getElementById("myytplayer");
-    $("#myytplayer").hide();
-};
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+        height: height.toFixed(0),
+        width: width.toString(),
+    });
+    $("#player").hide();
+}
+
 
 function mouseOver(e){
     var c = $('svg')[0].getElementById('circle');
@@ -67,17 +72,41 @@ function mouseOver(e){
     c.setAttribute('cx', e.pageX);
 }
 
+var state = 0;
+function close(){
+    state = 1;
+    var c = $('svg')[0].getElementById('circle');
+    c.setAttribute('r', 100);
+    $("#player").css('pointer-events', 'none');
+}
+
+function open(){
+    state = 2;
+    var c = $('svg')[0].getElementById('circle');
+    c.setAttribute('r', 10000);
+    $("#player").css('pointer-events', 'all');
+}
+
+
+
 $(document).ready(function(){
     $("#videoIdInput").keypress(function(e){
         console.log(e.keyCode);
         if (e.keyCode == 13 && player){
-            $("#myytplayer").show();
+            $("#player").show()
             player.loadVideoById($("#videoIdInput").val());
-            var c = $('svg')[0].getElementById('circle');
-            c.setAttribute('r', 100)
+            close();
         }
     });
     $(window).mousemove(mouseOver);
+    $(window).mouseup(function(){
+        if (state == 1){
+            open();
+        }
+        else if (state == 2){
+            close();
+        }
+    });
 });
 
 
